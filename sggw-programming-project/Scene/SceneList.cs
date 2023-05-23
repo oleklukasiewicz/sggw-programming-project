@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace sggw_programming_project
+namespace sggw_programming_project.Scene
 {
-    internal class Class1
+    internal class SceneList
     {
-        private int Id { get; set; }
+        //klasa zawierająca liste scen (pól)
     }
 }

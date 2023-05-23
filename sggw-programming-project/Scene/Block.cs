@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace sggw_programming_project
+namespace sggw_programming_project.Scene
 {
-    internal class Program
+    internal class Block
     {
-        static void Main(string[] args)
-        {
-            
-        }
+        // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
     }
 }

@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace sggw_programming_project
+namespace sggw_programming_project.Entity
 {
-    internal class Program
+    internal class BaseEntity
     {
-        static void Main(string[] args)
-        {
-            
-        }
+        //podstawowy obiekt (przeciwnik/ zwierze/ gracz)
     }
 }
