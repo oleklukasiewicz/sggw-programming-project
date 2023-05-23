@@ -10,6 +10,7 @@ namespace sggw_programming_project
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("hello world");
         }
     }
 }
