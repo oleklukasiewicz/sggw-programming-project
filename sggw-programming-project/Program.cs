@@ -14,6 +14,7 @@ namespace sggw_programming_project
             Console.Write("test");
             Console.WriteLine("test 2 commit");
             Console.WriteLine("TEEEEESTTTTT");
+            Console.WriteLine("Branch Klasa");
         }
     }
 }
