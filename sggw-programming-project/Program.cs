@@ -13,6 +13,7 @@ namespace sggw_programming_project
             Console.Write("now commit");
             Console.Write("test");
             Console.WriteLine("test 2 commit");
+            Console.WriteLine("TEEEEESTTTTT");
         }
     }
 }
