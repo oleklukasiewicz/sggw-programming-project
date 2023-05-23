@@ -10,7 +10,8 @@ namespace sggw_programming_project
     {
         static void Main(string[] args)
         {
-            Console.Write("test");  
+            Console.Write("test");
+            Console.WriteLine("test 2 commit");
         }
     }
 }
