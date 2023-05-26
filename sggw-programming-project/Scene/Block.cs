@@ -45,8 +45,8 @@ namespace sggw_programming_project.Scene
         }
         public Block(int x,int y,string icon)
         {
-            _x = 0;
-            _y = 0;
+            _x = x;
+            _y = y;
             _icon = icon;
         }
     }
