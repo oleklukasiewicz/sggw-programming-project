@@ -52,7 +52,6 @@ namespace sggw_programming_project.Scene
             _entity = entity;
             _icon = icon;
         }
-
         public void SetCoords(int x,int y)
         {
             _x = x;

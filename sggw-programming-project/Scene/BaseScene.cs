@@ -24,7 +24,7 @@ namespace sggw_programming_project.Scene
             _width = width;
             _height = height;
             _defaultBlock = defaultBlock;
-
+          
             _sceneblockstab = new Block[width, height];
             _blocksToInsert = blocksToInsert;
 
