@@ -1,9 +1,4 @@
 ﻿using sggw_programming_project.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace sggw_programming_project.Scene
 {
@@ -47,6 +42,13 @@ namespace sggw_programming_project.Scene
         {
             _x = x;
             _y = y;
+            _icon = icon;
+        }
+        public Block(int x,int y, string icon, IBaseEntity entity)
+        {
+            _x = x;
+            _y = y;
+            _entity = entity;
             _icon = icon;
         }
     }

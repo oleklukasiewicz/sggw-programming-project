@@ -1,11 +1,5 @@
 ﻿using sggw_programming_project.Scene;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace sggw_programming_project.Blocks
 {
