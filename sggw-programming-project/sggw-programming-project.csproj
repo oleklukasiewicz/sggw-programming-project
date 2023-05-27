@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocks\GrassBlock.cs" />
+    <Compile Include="EntityControllers\BaseEntityController.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Item\BaseItem.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene\Block.cs" />
     <Compile Include="Scene\BaseScene.cs" />
+    <Compile Include="Scene\IBlock.cs" />
     <Compile Include="Scene\SceneList.cs" />
   </ItemGroup>
   <ItemGroup>
