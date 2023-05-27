@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocks\GrassBlock.cs" />
+    <Compile Include="EntityControllers\BaseEntityController.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Item\BaseItem.cs" />
