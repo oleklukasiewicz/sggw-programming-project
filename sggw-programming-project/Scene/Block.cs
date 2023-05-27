@@ -17,7 +17,7 @@ namespace sggw_programming_project.Scene
         private int _y;
 
         //wyświetlanie i interakcje
-        public string Icon { get => _icon; }
+        public virtual string Icon { get => _icon; }
         private string _icon;
 
         //czy da się wejść na pole?

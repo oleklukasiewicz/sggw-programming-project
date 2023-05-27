@@ -9,7 +9,10 @@ namespace sggw_programming_project.Blocks
 {
     internal class GrassBlock: Block
     {
-        public GrassBlock(int x,int y):base(x,y)
+        public override string Icon { get; } = "[ikonka]";
+
+        // tak \/ albo tak /\ jak wolisz
+        public GrassBlock(int x,int y):base(x,y,"[ikonka]")
         {
             //dodać entity dla trawy 
         }
