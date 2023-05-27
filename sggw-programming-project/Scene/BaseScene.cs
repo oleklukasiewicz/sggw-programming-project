@@ -15,6 +15,7 @@ namespace sggw_programming_project.Scene
         // domyślny blok do wypełnienia sceny
         private Block _defaultBlock;
         private Block[,] _sceneblockstab;
+        private List<Block> _blocksToInsert;
 
         public BaseScene(int id, int width, int height, Block defaultBlock, List<Block> blocksToInsert)
         {
@@ -23,35 +24,53 @@ namespace sggw_programming_project.Scene
             _width = width;
             _height = height;
             _defaultBlock = defaultBlock;
+          
+            _sceneblockstab = new Block[width, height];
+            _blocksToInsert = blocksToInsert;
 
-            _sceneblockstab = new Block[width,height];
-            for (int i = 0; i < _height; i++)
-            {
-                for (int j = 0; j < _width; j++)
-                    _sceneblockstab[i,j] = _defaultBlock;
-            }
-
-            //zapełnianie sceny blokamiw (drzewa itp.)
-            foreach (var block in blocksToInsert)
-            {
-                if (block.X <= _width && block.Y <= _height)
-                    _sceneblockstab[block.X,block.Y] = block;
-            }
         }
-    
+
         //metoda do wyświetlania sceny
         public void Render()
         {
-            for(int i = 0; i < _height; i++)
+            //zapełnianie sceny blokamiw (drzewa itp.)
+            for (int i = 0; i < _height; i++)
             {
-                for(int j = 0; j < _width; j++)
+                for (int j = 0; j < _width; j++)
+                    _sceneblockstab[i, j] = _defaultBlock;
+            }
+
+            foreach (var block in _blocksToInsert)
+            {
+                if (block.X < _width && block.Y < _height)
+                    _sceneblockstab[block.X, block.Y] = block;
+            }
+
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
                 {
-                    string icon = _sceneblockstab[i,j].Icon;
+                    string icon = _sceneblockstab[i, j].Icon;
                     Console.Write(icon);
                 }
                 Console.WriteLine();
             }
 
+        }
+
+        public void MoveBlock(int x, int y, int targetX, int targetY)
+        {
+            if (!_sceneblockstab[targetX, targetY].CanBeStepIn)
+                return;
+
+            if (targetX < _width && targetY < _height)
+                _sceneblockstab[x, y].SetCoords(targetX, targetY);
+            // przerenderownie
+            this.Render();
+        }
+        public void MoveBlockBy(int x,int y,int targetX, int targetY)
+        {
+            MoveBlock(x,y,x + targetX, y + targetY);
         }
 
     }
