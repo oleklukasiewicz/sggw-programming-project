@@ -29,6 +29,9 @@ namespace sggw_programming_project
             });
             scene1.Render();
             Console.ReadKey();
+            Console.Clear();
+            scene1.MoveBlock(0, 0, 4, 5);
+            Console.ReadKey();
         }
     }
 }

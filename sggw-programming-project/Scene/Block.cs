@@ -16,7 +16,7 @@ namespace sggw_programming_project.Scene
         private string _icon;
 
         //czy da się wejść na pole?
-        public bool CanBeStepIn { get; set; }
+        public bool CanBeStepIn { get; set; } = true;
 
         public IBaseEntity BlockEntity { get => _entity; }
         private IBaseEntity _entity { get; set; }
