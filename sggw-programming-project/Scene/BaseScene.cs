@@ -1,10 +1,5 @@
-﻿using sggw_programming_project.Blocks;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace sggw_programming_project.Scene
 {
@@ -14,13 +9,11 @@ namespace sggw_programming_project.Scene
         public int Id { get => _id; }
         private int _id { get; set; }
 
-        // domyślny blok do wypełnienia sceny
-        private Block _defaultBlock;
-
         private int _width;
         private int _height;
 
-        private List<List<Block>> _sceneblocks;
+        // domyślny blok do wypełnienia sceny
+        private Block _defaultBlock;
         private Block[,] _sceneblockstab;
 
         public BaseScene(int id, int width, int height, Block defaultBlock, List<Block> blocksToInsert)
@@ -31,15 +24,11 @@ namespace sggw_programming_project.Scene
             _height = height;
             _defaultBlock = defaultBlock;
 
-            _sceneblocks = new List<List<Block>>();
             _sceneblockstab = new Block[width,height];
             for (int i = 0; i < _height; i++)
             {
                 for (int j = 0; j < _width; j++)
-                {
-                    // _sceneblocks[i][j] = _defaultBlock; //Wyjątek ArgumentOutOfRangeException ?
                     _sceneblockstab[i,j] = _defaultBlock;
-                }
             }
 
             //zapełnianie sceny blokamiw (drzewa itp.)
