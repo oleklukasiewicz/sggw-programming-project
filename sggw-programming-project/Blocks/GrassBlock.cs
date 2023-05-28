@@ -1,22 +1,32 @@
 ﻿using sggw_programming_project.Scene;
 using System;
+using System.Runtime.InteropServices;
 
 namespace sggw_programming_project.Blocks
 {
     internal class GrassBlock: Block
     {
-        public override string Icon { get; } = "[ikonka]";
-
-        // tak \/ albo tak /\ jak wolisz
-        public GrassBlock(int x,int y):base(x,y,"[ikonka]")
+       /* private string _icon;
+        public override string Icon
         {
-         //chciałabym tu przypisać domyślną ikonke, ale jak sie odwołać do tej zmiennej?
+            get; 
+        } */
+        public GrassBlock(int x,int y):base(x,y)
+        { 
         }
         public GrassBlock():base() 
-        { }
+        {
+            this._icon = "\ud83c\udf31";
+        }
         public GrassBlock(int x, int y, string icon) : base(x, y, icon)
         {
 
+        }
+        public void CreateGrassBlock()
+        {
+            Random random = new Random();
+            this._x = random.Next(16); 
+            this._y = random.Next(16);
         }
        
     }
