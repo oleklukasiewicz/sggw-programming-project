@@ -20,7 +20,7 @@ namespace sggw_programming_project
             BaseScene scene1 = new BaseScene(1,16,16, 10, 5,10,15,10);
             scene1.Render();
             //scene1.MoveBlock(0, 0, 4, 5);
-            scene1.Move();
+            scene1.AddCharacterControls();
             Console.ReadKey();
         }
         /* To DO:

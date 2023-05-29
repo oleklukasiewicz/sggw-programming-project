@@ -10,11 +10,5 @@ namespace sggw_programming_project.Blocks
         {
             this._icon = "\ud83e\udeb5";
         }
-        public void CreateTrunkBlock()
-        {
-            Random random = new Random();
-            this._x = random.Next(16);
-            this._y = random.Next(16);
-        }
     }
 }

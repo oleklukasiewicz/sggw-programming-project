@@ -13,12 +13,5 @@ namespace sggw_programming_project.Blocks
         {
             this._icon = "\ud83c\udf52";
         }
-
-        public void CreateFruitBlock()
-        {
-            Random random = new Random();
-            this._x = random.Next(16);
-            this._y = random.Next(16);
-        }
     }
 }

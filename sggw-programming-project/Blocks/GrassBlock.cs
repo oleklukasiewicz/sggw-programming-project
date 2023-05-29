@@ -22,12 +22,6 @@ namespace sggw_programming_project.Blocks
         {
 
         }
-        public void CreateGrassBlock()
-        {
-            Random random = new Random();
-            this._x = random.Next(16); 
-            this._y = random.Next(16);
-        }
        
     }
 }

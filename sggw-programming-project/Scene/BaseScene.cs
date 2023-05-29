@@ -19,6 +19,7 @@ namespace sggw_programming_project.Scene
         private Block _player;
         private Block _enemy;
         private Block[,] _sceneblockstab;
+        private List<Block> _entities = new List<Block>();
         private List<Block> _blocksToInsert;
 
         public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone, 
@@ -32,6 +33,8 @@ namespace sggw_programming_project.Scene
             _sceneblockstab = new Block[width, height];
             _player = new PlayerBlock();
             _enemy = new EnemyBlock();
+            _entities.Add(_player);
+            _entities.Add(_enemy);
             _blocksToInsert = GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk);
 
 
@@ -54,7 +57,12 @@ namespace sggw_programming_project.Scene
                 if (block.X < _width && block.Y < _height)
                     _sceneblockstab[block.X, block.Y] = block;
             }
-             
+            //zapełnianie mobami
+            for (int i = 0; i < _entities.Count; i++)
+            {
+                var entity = _entities[i];
+                _sceneblockstab[entity.X, entity.Y] = entity;
+            }
             //Wydrukowanie sceny na ekranie
             for (int i = 0; i < _height; i++)
             {
@@ -67,11 +75,6 @@ namespace sggw_programming_project.Scene
                 if(i == 1) Console.Write("         Player Health: 20");
                 if (i == 2) Console.Write("         Enemy Health: 0");
                 Console.WriteLine();
-            }
-
-            if(_player == null)
-            {
-                _player = _sceneblockstab[0, 0];
             }
         }
 
@@ -90,7 +93,7 @@ namespace sggw_programming_project.Scene
             MoveBlock(x,y,x + targetX, y + targetY);
         }
 
-        public void Move()
+        public void AddCharacterControls()
         {
             ConsoleKeyInfo pressedKey;
             do

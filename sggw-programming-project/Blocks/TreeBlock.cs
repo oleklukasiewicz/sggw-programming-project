@@ -9,10 +9,4 @@ internal class TreeBlock:Block
         this._icon = "\ud83c\udf33";
 
     }
-    public void CreateTreeBlock()
-    {
-        Random random = new Random();
-        this._x = random.Next(16);
-        this._y = random.Next(16);
-    }
 }
