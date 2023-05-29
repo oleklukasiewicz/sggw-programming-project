@@ -5,7 +5,12 @@ namespace sggw_programming_project.Scene
 {
     internal class Block : IBlock
     {
+        //TODO: dodać event OnStepIn -> jakas akcja gdy sie najdzie na pole
+
         // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
+
+        public virtual string Id { get; } = "block";
+
         protected int _x;
         public int X
         {
@@ -25,16 +30,15 @@ namespace sggw_programming_project.Scene
         }
 
         //wyświetlanie i interakcje
-        public string Icon { get => _icon; }
-        protected string _icon;
+        public virtual string Icon { get; set; }
 
         //czy da się wejść na pole?
-        public bool CanBeStepIn { get; set; } = true;
+        public virtual bool CanBeStepIn { get; set; } = true;
 
         public IBaseEntity BlockEntity { get => _entity; }
         private IBaseEntity _entity { get; set; }
 
-
+        Random random = new Random();
 
         public Block(int x, int y, IBaseEntity entity)
         {
@@ -50,7 +54,7 @@ namespace sggw_programming_project.Scene
         }
         public Block(string icon)
         {
-          _icon = icon;
+          Icon = icon;
         }
         public Block()
         {
@@ -62,14 +66,14 @@ namespace sggw_programming_project.Scene
         {
             _x = x;
             _y = y;
-            _icon = icon;
+            Icon = icon;
         }
         public Block(int x,int y, string icon, IBaseEntity entity)
         {
             _x = x;
             _y = y;
             _entity = entity;
-            _icon = icon;
+            Icon = icon;
         }
         public void SetCoords(int x,int y)
         {
@@ -105,11 +109,11 @@ namespace sggw_programming_project.Scene
 
         public void SetRandomLocation()
         {
-            Random random = new Random();
+        
             this._x = random.Next(16);
             this._y = random.Next(16);
         }
-
+      
     }
 
 }

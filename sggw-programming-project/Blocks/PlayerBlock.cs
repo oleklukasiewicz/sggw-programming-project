@@ -3,12 +3,11 @@ using System;
 
 internal class PlayerBlock : Block
 {
-    public PlayerBlock()
+    public override string Icon { get; set; } = "\ud83d\udc36";
+    public override string Id { get; } = "player";
+    public PlayerBlock() : base()
     {
-        Random random = new Random();
-        this._icon = "\ud83d\udc36";
-        this._x = random.Next(16);
-        this._y = random.Next(16);
+        this.SetRandomLocation();
     }
 
 }

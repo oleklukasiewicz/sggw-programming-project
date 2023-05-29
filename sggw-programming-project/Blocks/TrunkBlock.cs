@@ -4,11 +4,14 @@ using System;
 
 namespace sggw_programming_project.Blocks
 {
-    internal class TrunkBlock: Block
+    internal class TrunkBlock : Block
     {
-        public TrunkBlock()
+        public override string Id { get; } = "trunk";
+        public override bool CanBeStepIn {get; set;} = false;
+        public override string Icon { get; set; } = "\ud83e\udeb5";
+        public TrunkBlock():base()
         {
-            this._icon = "\ud83e\udeb5";
+            
         }
     }
 }

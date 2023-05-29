@@ -22,10 +22,10 @@ namespace sggw_programming_project.Scene
         private List<Block> _entities = new List<Block>();
         private List<Block> _blocksToInsert;
 
-        public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone, 
+        public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone,
             int howTree, int howTrunk)
         {
-            
+
             _id = id;
             _width = width;
             _height = height;
@@ -57,12 +57,14 @@ namespace sggw_programming_project.Scene
                 if (block.X < _width && block.Y < _height)
                     _sceneblockstab[block.X, block.Y] = block;
             }
+       
             //zapełnianie mobami
             for (int i = 0; i < _entities.Count; i++)
             {
                 var entity = _entities[i];
                 _sceneblockstab[entity.X, entity.Y] = entity;
             }
+            Console.Clear();
             //Wydrukowanie sceny na ekranie
             for (int i = 0; i < _height; i++)
             {
@@ -71,8 +73,8 @@ namespace sggw_programming_project.Scene
                     string icon = _sceneblockstab[i, j].Icon;
                     Console.Write(icon);
                 }
-                if(i == 0) Console.Write("         Score: 99");
-                if(i == 1) Console.Write("         Player Health: 20");
+                if (i == 0) Console.Write("         Score: 99");
+                if (i == 1) Console.Write("         Player Health: 20");
                 if (i == 2) Console.Write("         Enemy Health: 0");
                 Console.WriteLine();
             }
@@ -80,17 +82,17 @@ namespace sggw_programming_project.Scene
 
         public void MoveBlock(int x, int y, int targetX, int targetY)
         {
-            if (!_sceneblockstab[targetX, targetY].CanBeStepIn)
-                return;
-
-            if (targetX < _width && targetY < _height)
-                _sceneblockstab[x, y].SetCoords(targetX, targetY);
+            if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
+            {
+                if (_sceneblockstab[targetX, targetY].CanBeStepIn)
+                    _sceneblockstab[x, y].SetCoords(targetX, targetY);
+            }
             // przerenderownie
             this.Render();
         }
-        public void MoveBlockBy(int x,int y,int targetX, int targetY)
+        public void MoveBlockBy(int x, int y, int targetX, int targetY)
         {
-            MoveBlock(x,y,x + targetX, y + targetY);
+            MoveBlock(x, y, x + targetX, y + targetY);
         }
 
         public void AddCharacterControls()
@@ -99,29 +101,26 @@ namespace sggw_programming_project.Scene
             do
             {
                 pressedKey = Console.ReadKey();
-                Console.Clear();
                 switch (pressedKey.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        _player.MoveUp();
+                        this.MoveBlockBy(_player.X, _player.Y, -1, 0);
                         break;
                     case ConsoleKey.DownArrow:
-                        _player.MoveDown();
+                        this.MoveBlockBy(_player.X, _player.Y, 1, 0);
                         break;
                     case ConsoleKey.RightArrow:
-                        _player.MoveRight();
+                        this.MoveBlockBy(_player.X, _player.Y, 0, 1);
                         break;
                     case ConsoleKey.LeftArrow:
-                        _player.MoveLeft();
+                        this.MoveBlockBy(_player.X, _player.Y, 0, -1);
                         break;
                     default:
                         break;
                 }
-                this.Render();
-
 
             } while (pressedKey.Key != ConsoleKey.Escape);
-             
+
         }
         private List<Block> GenerateListBlock(int howGrass, int howFruit, int howStone,
             int howTree, int howTrunk)
@@ -173,7 +172,7 @@ namespace sggw_programming_project.Scene
 
             bool isDone = false;
             bool isRepeat = false;
-           
+
             while (!isDone)
             {
                 block.SetRandomLocation();

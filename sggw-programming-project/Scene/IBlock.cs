@@ -10,5 +10,6 @@ namespace sggw_programming_project.Scene
         int X { get; }
         int Y { get; }
         void SetCoords(int x, int y);
+         void SetRandomLocation();
     }
 }

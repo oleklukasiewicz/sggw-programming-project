@@ -9,9 +9,11 @@ namespace sggw_programming_project.Blocks
 {
     internal class FruitBlock : Block
     {
+        public override string Id { get; } = "fruit";
+        public override string Icon { get; set; } = "\ud83c\udf52";
         public FruitBlock()
         {
-            this._icon = "\ud83c\udf52";
+         
         }
     }
 }
