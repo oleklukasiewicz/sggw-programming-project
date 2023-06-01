@@ -1,25 +1,44 @@
 ﻿using sggw_programming_project.Entity;
+using System;
 
 namespace sggw_programming_project.Scene
 {
     internal class Block : IBlock
     {
-        // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
-        public int X { get => _x; }
-        public int Y { get => _y; }
+        //TODO: dodać event OnStepIn -> jakas akcja gdy sie najdzie na pole
 
-        private int _x;
-        private int _y;
+        // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
+
+        public virtual string Id { get; } = "block";
+
+        protected int _x;
+        public int X
+        {
+            get
+            {
+               return _x;
+            }
+        }
+
+        protected int _y;
+        public int Y
+        {
+            get
+            {
+                return _y;
+            }
+        }
 
         //wyświetlanie i interakcje
-        public virtual string Icon { get => _icon; }
-        private string _icon;
+        public virtual string Icon { get; set; }
 
         //czy da się wejść na pole?
-        public bool CanBeStepIn { get; set; } = true;
+        public virtual bool CanBeStepIn { get; set; } = true;
 
         public IBaseEntity BlockEntity { get => _entity; }
         private IBaseEntity _entity { get; set; }
+
+        Random random = new Random();
 
         public Block(int x, int y, IBaseEntity entity)
         {
@@ -33,6 +52,10 @@ namespace sggw_programming_project.Scene
             _y = y;
             _entity = new BaseEntity();
         }
+        public Block(string icon)
+        {
+          Icon = icon;
+        }
         public Block()
         {
             _x = 0;
@@ -43,20 +66,54 @@ namespace sggw_programming_project.Scene
         {
             _x = x;
             _y = y;
-            _icon = icon;
+            Icon = icon;
         }
         public Block(int x,int y, string icon, IBaseEntity entity)
         {
             _x = x;
             _y = y;
             _entity = entity;
-            _icon = icon;
+            Icon = icon;
         }
         public void SetCoords(int x,int y)
         {
             _x = x;
-            _y=y;
+            _y = y;
             // invoke event for scene update
         }
+        
+        public void MoveUp()
+        {
+            if(_x > 0 && _x <= 15) 
+            _x -= 1;
+
+        }
+
+        public void MoveDown()
+        {
+            if(_x >= 0 && _x < 15)
+            _x += 1;
+        }
+
+        public void MoveRight()
+        {
+            if(_y >=0 && _y < 15)
+            _y += 1;
+        }
+
+        public void MoveLeft()
+        {
+            if(_y > 0 && _y <=15)
+            _y -=1;
+        }
+
+        public void SetRandomLocation()
+        {
+        
+            this._x = random.Next(16);
+            this._y = random.Next(16);
+        }
+      
     }
+
 }
