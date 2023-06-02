@@ -14,6 +14,8 @@ namespace sggw_programming_project.Scene
         private int _width;
         private int _height;
 
+        //punkty
+
         // domyślny blok do wypełnienia sceny
         private Block _defaultBlock;
         private Block _player;
@@ -79,13 +81,26 @@ namespace sggw_programming_project.Scene
                 Console.WriteLine();
             }
         }
-
+        public void OnBlockStepIn(object sender, EventArgs e)
+        {
+            Block block = (Block)sender;
+            Console.WriteLine("COŚ"+" "+block.Id);
+            if(block.Id=="fruit")
+            {
+                //dodawanie punktów
+            }
+        }
         public void MoveBlock(int x, int y, int targetX, int targetY)
         {
             if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
             {
                 if (_sceneblockstab[targetX, targetY].CanBeStepIn)
+                {
+                    _sceneblockstab[targetX, targetY].OnStepIn += OnBlockStepIn;
+                   
+                    _sceneblockstab[targetX, targetY].StepIn();
                     _sceneblockstab[x, y].SetCoords(targetX, targetY);
+                }
             }
             // przerenderownie
             this.Render();
@@ -128,7 +143,10 @@ namespace sggw_programming_project.Scene
             //tworzenie listy elementów które mają się pojawić na planszy z losowym rozmieszczeniem.
             List<Block> list = new List<Block>();
             list.Add(_player);
-            _enemy.SetRandomLocation();
+            do
+            {
+                _enemy.SetRandomLocation();
+            } while (_enemy.X == _player.X && _enemy.Y == _player.Y);
             list.Add(_enemy); //tu trzeba jeszcze poprawic, zeby koordynaty playera i enemy sie nie pokrywały.
             //zrobilabym to w konstruktorze EnemyBlock ale nie wiem jak odwołać się do koordynatów playera.
             for (int i = 0; i < howGrass; i++)

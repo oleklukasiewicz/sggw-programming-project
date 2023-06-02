@@ -8,7 +8,22 @@ namespace sggw_programming_project.Scene
         //TODO: dodać event OnStepIn -> jakas akcja gdy sie najdzie na pole
 
         // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
+        public event EventHandler OnStepIn;
+        protected virtual void _onStepIn()
+        {
+            //coś
+            EventArgs _args = new EventArgs();
+            _onStepHandler();
+            OnStepIn?.Invoke(this,_args);
+        }
+        protected virtual void _onStepHandler() {
 
+            Console.WriteLine("Block");
+        }
+        public void StepIn()
+        {
+            _onStepIn();
+        }
         public virtual string Id { get; } = "block";
 
         protected int _x;

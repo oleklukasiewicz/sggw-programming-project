@@ -11,6 +11,12 @@ namespace sggw_programming_project.Blocks
     {
         public override string Id { get; } = "fruit";
         public override string Icon { get; set; } = "\ud83c\udf52";
+
+
+        protected override void _onStepHandler()
+        {
+            // coś
+        }
         public FruitBlock()
         {
          
