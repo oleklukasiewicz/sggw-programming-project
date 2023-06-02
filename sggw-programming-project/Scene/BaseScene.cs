@@ -96,7 +96,7 @@ namespace sggw_programming_project.Scene
             {
                 if (_sceneblockstab[targetX, targetY].CanBeStepIn)
                 {
-                    _sceneblockstab[targetX, targetY].OnStepIn += OnBlockStepIn;
+                    //_sceneblockstab[targetX, targetY].OnStepIn += OnBlockStepIn;
                    
                     _sceneblockstab[targetX, targetY].StepIn();
                     _sceneblockstab[x, y].SetCoords(targetX, targetY);
