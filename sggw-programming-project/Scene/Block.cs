@@ -3,35 +3,19 @@ using System;
 
 namespace sggw_programming_project.Scene
 {
+    delegate void StepInHandler(object sender, StepInEventArgs e);
+    delegate void StepOutHandler(object sender, StepOutEventArgs e);
+    delegate void CoordsChangeHandler(object sender, CoordsChangeEventArgs e);
     internal class Block : IBlock
     {
-        //TODO: dodać event OnStepIn -> jakas akcja gdy sie najdzie na pole
-
-        // klasa dla podstawowego pole (drzewo/ sciana / przeciwnik)
-        public event EventHandler OnStepIn;
-        protected virtual void _onStepIn()
-        {
-            //coś
-            EventArgs _args = new EventArgs();
-            _onStepHandler();
-            OnStepIn?.Invoke(this,_args);
-        }
-        protected virtual void _onStepHandler() {
-
-            Console.WriteLine("Block");
-        }
-        public void StepIn()
-        {
-            _onStepIn();
-        }
-        public virtual string Id { get; } = "block";
-
+        Random random = new Random();
+        
         protected int _x;
         public int X
         {
             get
             {
-               return _x;
+                return _x;
             }
         }
 
@@ -44,16 +28,15 @@ namespace sggw_programming_project.Scene
             }
         }
 
-        //wyświetlanie i interakcje
-        public virtual string Icon { get; set; }
-
-        //czy da się wejść na pole?
-        public virtual bool CanBeStepIn { get; set; } = true;
-
         public IBaseEntity BlockEntity { get => _entity; }
         private IBaseEntity _entity { get; set; }
 
-        Random random = new Random();
+        public event StepInHandler OnStepIn;
+        public event StepOutHandler OnStepOut;
+        public event CoordsChangeHandler OnCoordsChange;
+        public virtual string Id { get; } = "block";
+        public virtual string Icon { get; set; }
+        public virtual bool CanBeStepIn { get; set; } = true;
 
         public Block(int x, int y, IBaseEntity entity)
         {
@@ -69,7 +52,7 @@ namespace sggw_programming_project.Scene
         }
         public Block(string icon)
         {
-          Icon = icon;
+            Icon = icon;
         }
         public Block()
         {
@@ -83,52 +66,88 @@ namespace sggw_programming_project.Scene
             _y = y;
             Icon = icon;
         }
-        public Block(int x,int y, string icon, IBaseEntity entity)
+        public Block(int x, int y, string icon, IBaseEntity entity)
         {
             _x = x;
             _y = y;
             _entity = entity;
             Icon = icon;
         }
-        public void SetCoords(int x,int y)
+        //onStepIn
+        protected virtual void _StepIn()
         {
+            StepInEventArgs _args = new StepInEventArgs(_x, _y);
+            OnStepIn?.Invoke(this, _args);
+        }
+        protected virtual void _CoordsChange(int oldX, int oldY)
+        {
+            CoordsChangeEventArgs _args = new CoordsChangeEventArgs(_x, _y, oldX, oldY);
+            OnCoordsChange?.Invoke(this, _args);
+        }
+        protected virtual void _StepOut()
+        {
+            StepOutEventArgs _args = new StepOutEventArgs(_x, _y);
+            OnStepOut?.Invoke(this, _args);
+        }
+        public void StepIn()
+        {
+            _StepIn();
+        }
+        public void StepOut()
+        {
+            _StepOut();
+        }
+        public void SetCoords(int x, int y)
+        {
+            int oldX = _x;
+            int oldY = _y;
+
             _x = x;
             _y = y;
-            // invoke event for scene update
+            
+            _CoordsChange(oldX, oldY);
+            
         }
-        
-        public void MoveUp()
-        {
-            if(_x > 0 && _x <= 15) 
-            _x -= 1;
-
-        }
-
-        public void MoveDown()
-        {
-            if(_x >= 0 && _x < 15)
-            _x += 1;
-        }
-
-        public void MoveRight()
-        {
-            if(_y >=0 && _y < 15)
-            _y += 1;
-        }
-
-        public void MoveLeft()
-        {
-            if(_y > 0 && _y <=15)
-            _y -=1;
-        }
-
         public void SetRandomLocation()
         {
-        
+
             this._x = random.Next(16);
             this._y = random.Next(16);
         }
-      
+    }
+    class StepInEventArgs : EventArgs
+    {
+        public int X;
+        public int Y;
+        public StepInEventArgs(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+    class StepOutEventArgs : EventArgs
+    {
+        public int X;
+        public int Y;
+        public StepOutEventArgs(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+    class CoordsChangeEventArgs : EventArgs
+    {
+        public int X;
+        public int Y;
+        public int OldX;
+        public int OldY;
+        public CoordsChangeEventArgs(int x, int y, int oldX, int oldY)
+        {
+            X = x;
+            Y = y;
+            OldX = oldX;
+            OldY = oldY;
+        }
     }
 
 }

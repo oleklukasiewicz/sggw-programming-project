@@ -8,13 +8,11 @@ namespace sggw_programming_project.Entity
 {
     internal class BaseEntity : IBaseEntity
     {
-        //podstawowy obiekt (przeciwnik/ zwierze/ gracz)
         public int Id { get => _id; }
         private int _id;
         public string Name { get=>_name; }
         private string _name;
 
-        // gdy obiekt ma byc niesniszcalny (wejście, wyjsćie z planszy itp)
         public bool IsImmune { get=>_isImmune; }
         private bool _isImmune;
         public int Health { get => _health; }
@@ -23,16 +21,11 @@ namespace sggw_programming_project.Entity
         public bool IsAlive { get => _isAlive; }
         private bool _isAlive = true;
 
-        //ile obrazeń zadaje (np. potwór -> 3)
-        public int Damage { get; set; }
+        public event EventHandler OnStatsChanged;
+        public event EventHandler OnDie;
+        public event EventHandler OnTakeDamage;
 
-        //string do wyświetlania bloku (np. dla drzewa może być 
-        // // \\/n  |  /n  |  
-        // czyli
-        // 
-        //    // \\
-        //      |
-        //      |
+        public int Damage { get; set; }
         public int TakeDamage(int damage)
         {
             if (!IsImmune)

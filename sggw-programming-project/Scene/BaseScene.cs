@@ -50,7 +50,10 @@ namespace sggw_programming_project.Scene
 
             _sceneLayers.Add(new SceneLayer(_width, _height));
             _sceneLayers[2].SetupScene(new List<Block>() { _player });
+
+            _player.OnCoordsChange += UpdateTab;
         }
+
         private Block _GetTopLayerBlock(int x, int y)
         {
             for (int l = _sceneLayers.Count - 1; l >= 0; l--)
@@ -152,6 +155,8 @@ namespace sggw_programming_project.Scene
                 if (i == 0) Console.Write("         Score: 99");
                 if (i == 1) Console.Write("         Player Health: 20");
                 if (i == 2) Console.Write("         Enemy Health: 0");
+                if (i == 3) Console.Write($"         Player X:{playerX}");
+                if (i == 4) Console.Write($"         Player Y:{playerY}");
                 Console.WriteLine();
             }
         }
@@ -160,10 +165,11 @@ namespace sggw_programming_project.Scene
             if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
             {
                 Block target = _GetTopLayerBlock(targetX, targetY);
+                Block source = _GetTopLayerBlock(x, y);
                 if (target.CanBeStepIn)
                 {
+                    source.StepOut();
                     target.StepIn();
-
                     targetScene.MoveBlockToCoords(x, y, targetX, targetY);
                 }
             }
@@ -202,6 +208,23 @@ namespace sggw_programming_project.Scene
                 }
 
             } while (pressedKey.Key != ConsoleKey.Escape);
+
+        }
+
+
+
+        ///UWAGA: TESTOWE METODY I POLA
+        ///
+        int playerX = 0;
+        int playerY = 0;
+        int playerHealth = 100;
+        private void UpdateTab(object sender, CoordsChangeEventArgs e)
+        {
+            playerX = e.X;
+            playerY = e.Y;
+        }
+        private void UpdatePlayerHealth()
+        {
 
         }
     }
