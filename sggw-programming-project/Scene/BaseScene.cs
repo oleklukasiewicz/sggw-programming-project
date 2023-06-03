@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace sggw_programming_project.Scene
 {
@@ -17,12 +18,15 @@ namespace sggw_programming_project.Scene
         //punkty
 
         // domyślny blok do wypełnienia sceny
-        private Block _defaultBlock;
+
         private Block _player;
         private Block _enemy;
-        private Block[,] _sceneblockstab;
+
+        private List<SceneLayer> _sceneLayers = new List<SceneLayer>();
+
+        // for enetity tracking
         private List<Block> _entities = new List<Block>();
-        private List<Block> _blocksToInsert;
+
 
         public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone,
             int howTree, int howTrunk)
@@ -31,124 +35,68 @@ namespace sggw_programming_project.Scene
             _id = id;
             _width = width;
             _height = height;
-            _defaultBlock = new Block("\ud83d\udfea");
-            _sceneblockstab = new Block[width, height];
+
             _player = new PlayerBlock();
             _enemy = new EnemyBlock();
+
             _entities.Add(_player);
             _entities.Add(_enemy);
-            _blocksToInsert = GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk);
 
+            _sceneLayers.Add(new SceneLayer(width, height, new Block("\ud83d\udfea")));
+            _sceneLayers[0].SetupScene(GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk));
 
+            _sceneLayers.Add(new SceneLayer(width, height));
+            _sceneLayers[1].SetupScene(new List<Block>() { _enemy });
+
+            _sceneLayers.Add(new SceneLayer(_width, _height));
+            _sceneLayers[2].SetupScene(new List<Block>() { _player });
         }
-
-        //metoda do wyświetlania sceny
-        public void Render()
+        private Block _GetTopLayerBlock(int x, int y)
         {
-            //Zapełnienie sceny domyślnymi blokami
-
-            for (int i = 0; i < _height; i++)
+            for (int l = _sceneLayers.Count - 1; l >= 0; l--)
             {
-                for (int j = 0; j < _width; j++)
-                    _sceneblockstab[i, j] = _defaultBlock;
-            }
-
-            //Zapełnienie sceny blokami typu drzewa itp.
-            foreach (var block in _blocksToInsert)
-            {
-                if (block.X < _width && block.Y < _height)
-                    _sceneblockstab[block.X, block.Y] = block;
-            }
-       
-            //zapełnianie mobami
-            for (int i = 0; i < _entities.Count; i++)
-            {
-                var entity = _entities[i];
-                _sceneblockstab[entity.X, entity.Y] = entity;
-            }
-            Console.Clear();
-            //Wydrukowanie sceny na ekranie
-            for (int i = 0; i < _height; i++)
-            {
-                for (int j = 0; j < _width; j++)
+                if (_sceneLayers[l].Scene[x, y] != null)
                 {
-                    string icon = _sceneblockstab[i, j].Icon;
-                    Console.Write(icon);
-                }
-                if (i == 0) Console.Write("         Score: 99");
-                if (i == 1) Console.Write("         Player Health: 20");
-                if (i == 2) Console.Write("         Enemy Health: 0");
-                Console.WriteLine();
-            }
-        }
-        public void OnBlockStepIn(object sender, EventArgs e)
-        {
-            Block block = (Block)sender;
-            Console.WriteLine("COŚ"+" "+block.Id);
-            if(block.Id=="fruit")
-            {
-                //dodawanie punktów
-            }
-        }
-        public void MoveBlock(int x, int y, int targetX, int targetY)
-        {
-            if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
-            {
-                if (_sceneblockstab[targetX, targetY].CanBeStepIn)
-                {
-                    //_sceneblockstab[targetX, targetY].OnStepIn += OnBlockStepIn;
-                   
-                    _sceneblockstab[targetX, targetY].StepIn();
-                    _sceneblockstab[x, y].SetCoords(targetX, targetY);
+                    return _sceneLayers[l].Scene[x, y];
                 }
             }
-            // przerenderownie
-            this.Render();
+            return null;
         }
-        public void MoveBlockBy(int x, int y, int targetX, int targetY)
+        private Block IsRepeatDone(Block block, List<Block> list)
         {
-            MoveBlock(x, y, x + targetX, y + targetY);
-        }
 
-        public void AddCharacterControls()
-        {
-            ConsoleKeyInfo pressedKey;
-            do
+            bool isDone = false;
+            bool isRepeat = false;
+
+            while (!isDone)
             {
-                pressedKey = Console.ReadKey();
-                switch (pressedKey.Key)
+                block.SetRandomLocation();
+
+                foreach (var item in list)
                 {
-                    case ConsoleKey.UpArrow:
-                        this.MoveBlockBy(_player.X, _player.Y, -1, 0);
+                    if (item.X == block.X && item.Y == block.Y)
+                    {
+                        isRepeat = true;
                         break;
-                    case ConsoleKey.DownArrow:
-                        this.MoveBlockBy(_player.X, _player.Y, 1, 0);
-                        break;
-                    case ConsoleKey.RightArrow:
-                        this.MoveBlockBy(_player.X, _player.Y, 0, 1);
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        this.MoveBlockBy(_player.X, _player.Y, 0, -1);
-                        break;
-                    default:
-                        break;
+                    }
+                    else
+                    {
+                        isRepeat = false;
+                    }
                 }
 
-            } while (pressedKey.Key != ConsoleKey.Escape);
+                if (isRepeat == false) isDone = true;
+            }
+            return block;
 
         }
+        //TODO: do przerobienia system losowego wsadzania bloków -> na jakiś bardziej optymalny
         private List<Block> GenerateListBlock(int howGrass, int howFruit, int howStone,
-            int howTree, int howTrunk)
+          int howTree, int howTrunk)
         {
             //tworzenie listy elementów które mają się pojawić na planszy z losowym rozmieszczeniem.
             List<Block> list = new List<Block>();
-            list.Add(_player);
-            do
-            {
-                _enemy.SetRandomLocation();
-            } while (_enemy.X == _player.X && _enemy.Y == _player.Y);
-            list.Add(_enemy); //tu trzeba jeszcze poprawic, zeby koordynaty playera i enemy sie nie pokrywały.
-            //zrobilabym to w konstruktorze EnemyBlock ale nie wiem jak odwołać się do koordynatów playera.
+
             for (int i = 0; i < howGrass; i++)
             {
                 Block bl = new GrassBlock();
@@ -185,34 +133,76 @@ namespace sggw_programming_project.Scene
             return list;
         }
 
-        public Block IsRepeatDone(Block block, List<Block> list)
+        //metoda do wyświetlania sceny
+        public void Render()
         {
-
-            bool isDone = false;
-            bool isRepeat = false;
-
-            while (!isDone)
+            Console.Clear();
+            //Wydrukowanie sceny na ekranie
+            for (int i = 0; i < _height; i++)
             {
-                block.SetRandomLocation();
-
-                foreach (var item in list)
+                for (int j = 0; j < _width; j++)
                 {
-                    if (item.X == block.X && item.Y == block.Y)
-                    {
-                        isRepeat = true;
+                    Block target = new Block();
+
+                    target = _GetTopLayerBlock(i, j);
+
+                    string icon = target.Icon;
+                    Console.Write(icon);
+                }
+                if (i == 0) Console.Write("         Score: 99");
+                if (i == 1) Console.Write("         Player Health: 20");
+                if (i == 2) Console.Write("         Enemy Health: 0");
+                Console.WriteLine();
+            }
+        }
+        public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
+        {
+            if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
+            {
+                Block target = _GetTopLayerBlock(targetX, targetY);
+                if (target.CanBeStepIn)
+                {
+                    target.StepIn();
+
+                    targetScene.MoveBlockToCoords(x, y, targetX, targetY);
+                }
+            }
+            // przerenderownie
+            this.Render();
+        }
+        public void MoveBlockBy(SceneLayer targetScene, int x, int y, int targetX, int targetY)
+        {
+            MoveBlock(targetScene, x, y, x + targetX, y + targetY);
+        }
+        public void AddCharacterControls()
+        {
+            //na razie na sztywno ale póżniej to zmienie (prawda?)
+            SceneLayer characterSceneLayer = _sceneLayers[2];
+
+            ConsoleKeyInfo pressedKey;
+            do
+            {
+                pressedKey = Console.ReadKey();
+                switch (pressedKey.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, -1, 0);
                         break;
-                    }
-                    else
-                    {
-                        isRepeat = false;
-                    }
+                    case ConsoleKey.DownArrow:
+                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 1, 0);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 0, 1);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 0, -1);
+                        break;
+                    default:
+                        break;
                 }
 
-                if (isRepeat == false) isDone = true;
-            }
-            return block;
+            } while (pressedKey.Key != ConsoleKey.Escape);
 
         }
-
     }
 }
