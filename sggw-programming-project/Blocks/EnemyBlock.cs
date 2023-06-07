@@ -13,6 +13,7 @@ namespace sggw_programming_project.Blocks
         public override string Icon { get; set; } = "\ud83d\ude21";
         public EnemyBlock()
         {
+            this.SetRandomLocation();
             
         }
     }

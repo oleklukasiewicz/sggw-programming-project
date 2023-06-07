@@ -12,6 +12,8 @@ namespace sggw_programming_project.Blocks
         public override string Id { get; } = "fruit";
         public override string Icon { get; set; } = "\ud83c\udf52";
 
+        public override int Point { get; set; } = 3;
+
         public FruitBlock()
         {
          

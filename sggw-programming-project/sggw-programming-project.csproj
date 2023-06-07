@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blocks\CandyBlock.cs" />
+    <Compile Include="Blocks\HeartBlock.cs" />
     <Compile Include="Blocks\EnemyBlock.cs" />
     <Compile Include="Blocks\FruitBlock.cs" />
     <Compile Include="Blocks\GrassBlock.cs" />
@@ -54,6 +56,9 @@
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Item\BaseItem.cs" />
+    <Compile Include="Item\GunItem.cs" />
+    <Compile Include="Item\KnifeItem.cs" />
+    <Compile Include="Item\ScissorsItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene\Block.cs" />

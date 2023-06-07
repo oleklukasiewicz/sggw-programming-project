@@ -6,9 +6,11 @@ namespace sggw_programming_project.Scene
     delegate void StepInHandler(object sender, StepInEventArgs e);
     delegate void StepOutHandler(object sender, StepOutEventArgs e);
     delegate void CoordsChangeHandler(object sender, CoordsChangeEventArgs e);
+    delegate void BlockStepInHandler();
     internal class Block : IBlock
     {
         Random random = new Random();
+        public virtual int Health { get; set; }
         
         protected int _x;
         public int X
@@ -34,9 +36,12 @@ namespace sggw_programming_project.Scene
         public event StepInHandler OnStepIn;
         public event StepOutHandler OnStepOut;
         public event CoordsChangeHandler OnCoordsChange;
+        public event BlockStepInHandler BlockStepIn;
         public virtual string Id { get; } = "block";
         public virtual string Icon { get; set; }
         public virtual bool CanBeStepIn { get; set; } = true;
+
+        public virtual int Point { get; set; }
 
         public Block(int x, int y, IBaseEntity entity)
         {
@@ -88,6 +93,10 @@ namespace sggw_programming_project.Scene
         {
             StepOutEventArgs _args = new StepOutEventArgs(_x, _y);
             OnStepOut?.Invoke(this, _args);
+        }
+        protected virtual void _BlockStepIn()
+        {
+
         }
         public void StepIn()
         {
@@ -150,4 +159,8 @@ namespace sggw_programming_project.Scene
         }
     }
 
+    class BlockStepInEventHandler : EventArgs
+    {
+
+    }
 }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace sggw_programming_project.Item
 {
-    internal class BaseItem
+    internal class GunItem:BaseItem
     {
-        public virtual string Id { get; }
-        public virtual string Icon { get; set; }
-        public virtual int Damage { get; set; }
+        public override string Icon { get; set; } = "\ud83d\udd2b";
+        public override int Damage { get; set; } = 50;
+        
     }
 }

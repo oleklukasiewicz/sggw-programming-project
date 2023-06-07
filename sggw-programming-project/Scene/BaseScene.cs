@@ -15,8 +15,8 @@ namespace sggw_programming_project.Scene
         private int _width;
         private int _height;
 
-        //punkty
-
+        private int _score = 0;
+        private int howFruitCandy = 0;
         // domyślny blok do wypełnienia sceny
 
         private Block _player;
@@ -29,7 +29,7 @@ namespace sggw_programming_project.Scene
 
 
         public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone,
-            int howTree, int howTrunk)
+            int howTree, int howTrunk, int howCandy, int howHeart)
         {
 
             _id = id;
@@ -38,12 +38,16 @@ namespace sggw_programming_project.Scene
 
             _player = new PlayerBlock();
             _enemy = new EnemyBlock();
-
+            howFruitCandy = howCandy + howFruit;
             _entities.Add(_player);
+            do
+            {
+                _enemy.SetRandomLocation();
+            } while (_player.X == _enemy.X && _player.Y == _enemy.Y);
             _entities.Add(_enemy);
 
             _sceneLayers.Add(new SceneLayer(width, height, new Block("\ud83d\udfea")));
-            _sceneLayers[0].SetupScene(GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk));
+            _sceneLayers[0].SetupScene(GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk, howCandy, howHeart));
 
             _sceneLayers.Add(new SceneLayer(width, height));
             _sceneLayers[1].SetupScene(new List<Block>() { _enemy });
@@ -95,7 +99,7 @@ namespace sggw_programming_project.Scene
         }
         //TODO: do przerobienia system losowego wsadzania bloków -> na jakiś bardziej optymalny
         private List<Block> GenerateListBlock(int howGrass, int howFruit, int howStone,
-          int howTree, int howTrunk)
+          int howTree, int howTrunk, int howCandy, int howHeart)
         {
             //tworzenie listy elementów które mają się pojawić na planszy z losowym rozmieszczeniem.
             List<Block> list = new List<Block>();
@@ -133,6 +137,18 @@ namespace sggw_programming_project.Scene
                 bl = IsRepeatDone(bl, list);
                 list.Add(bl);
             }
+            for (int i = 0; i < howCandy; i++)
+            {
+                Block bl = new CandyBlock();
+                bl = IsRepeatDone(bl, list);
+                list.Add(bl);
+            }
+            for (int i = 0; i < howHeart; i++)
+            {
+                Block bl = new HeartBlock();
+                bl = IsRepeatDone(bl, list);
+                list.Add(bl);
+            }
             return list;
         }
 
@@ -152,15 +168,52 @@ namespace sggw_programming_project.Scene
                     string icon = target.Icon;
                     Console.Write(icon);
                 }
-                if (i == 0) Console.Write("         Score: 99");
-                if (i == 1) Console.Write("         Player Health: 20");
-                if (i == 2) Console.Write("         Enemy Health: 0");
-                if (i == 3) Console.Write($"         Player X:{playerX}");
-                if (i == 4) Console.Write($"         Player Y:{playerY}");
+                if (i == 0) Console.Write("         Score: " + _score);
+                if (i == 1) Console.Write("         Ilość do zdobycia: " + howFruitCandy);
+                if (i == 2) Console.Write("         Player Health: " + _player.Health);
+                if (i == 3) Console.Write("         Enemy Health: " + _enemy.Health);
+                if (i == 4) Console.Write($"         Player X:{playerX}");
+                if (i == 5) Console.Write($"         Player Y:{playerY}");
                 Console.WriteLine();
             }
         }
-        public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
+
+        protected virtual void OnBlockStepIn(object sender)
+        {
+            Block block = (Block)sender;
+            if (block.Id == "fruit")
+            {
+                
+                    _score += block.Point;
+                    howFruitCandy--;
+                    _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                
+            }
+
+            if (block.Id == "candy")
+            {
+                
+                    _score += block.Point;
+                    howFruitCandy--;
+                    _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+
+            }
+
+            if(block.Id == "enemy")
+            {
+                _player.Health -= 30;
+            }
+
+            if(block.Id == "heart")
+            {
+                _player.Health += 50;
+                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+            }
+
+
+        }
+
+            public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
             if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
             {
@@ -168,13 +221,13 @@ namespace sggw_programming_project.Scene
                 Block source = _GetTopLayerBlock(x, y);
                 if (target.CanBeStepIn)
                 {
+                    OnBlockStepIn(target);
                     source.StepOut();
                     target.StepIn();
                     targetScene.MoveBlockToCoords(x, y, targetX, targetY);
                 }
             }
-            // przerenderownie
-            this.Render();
+            isWin();
         }
         public void MoveBlockBy(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
@@ -206,12 +259,66 @@ namespace sggw_programming_project.Scene
                     default:
                         break;
                 }
-
+                EnemyControls();
             } while (pressedKey.Key != ConsoleKey.Escape);
+
 
         }
 
+        public void EnemyControls()
+        {   //Poruszanie się naszego wroga
+            //Porusza się za kazdym razem gdy uzytkownik wciśnie klawisz, nie wiem jak to zrobić
+            //aby poruszał się niezależnie :( help
+            Random random = new Random();
+            bool x = true;
+            SceneLayer characterSceneLayer = _sceneLayers[1];
+            while (x)
+            {
+                int number = random.Next(5);
+                switch (number)
+                {
+                    case 0:
+                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, -1, 0);
+                        x = false;
+                        break;
+                    case 1:
+                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 1, 0);
+                        x = false;
+                        break;
+                    case 2:
+                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, 1);
+                        x = false;
+                        break;
+                    case 3:
+                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, -1);
+                        x = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
 
+        }
+
+        public void isWin()
+        {
+            //Metoda sprawdzająca czy użytkownik Wygrał czy Przegrał
+            if (howFruitCandy > 0 && _player.Health > 0)
+            {
+                // przerenderownie
+                this.Render();
+            }
+            else if(_player.Health <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Straciłeś życie! Przegrałeś!");
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Wygrałeś! Udało Ci się zdobyć {0} Punktów!", _score);
+            }
+        }
 
         ///UWAGA: TESTOWE METODY I POLA
         ///

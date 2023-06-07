@@ -16,7 +16,7 @@ namespace sggw_programming_project.Blocks
         }
         public GrassBlock():base() 
         {
-            Icon = "\ud83c\udf31";
+            Icon = "\ud83c\udf3f";
         }
         public GrassBlock(int x, int y, string icon) : base(x, y, icon)
         {

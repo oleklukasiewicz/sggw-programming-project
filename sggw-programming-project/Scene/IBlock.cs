@@ -1,4 +1,5 @@
 ﻿using sggw_programming_project.Entity;
+using System.Dynamic;
 
 namespace sggw_programming_project.Scene
 {
@@ -9,7 +10,10 @@ namespace sggw_programming_project.Scene
         string Icon { get; }
         int X { get; }
         int Y { get; }
+        int Point { get; set; }
         void SetCoords(int x, int y);
-         void SetRandomLocation();
+        void SetRandomLocation();
+
+        int Health { get; set; }
     }
 }
