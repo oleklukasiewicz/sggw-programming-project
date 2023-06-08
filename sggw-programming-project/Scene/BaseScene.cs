@@ -156,6 +156,12 @@ namespace sggw_programming_project.Scene
         }
 
         //metoda do wyświetlania sceny
+        public void MenuControl()
+        {
+            Menu menu = new Menu(_player);
+            menu.ChooseAvatar();
+            Console.Clear();
+        }
         public void Render()
         {
             Console.Clear();

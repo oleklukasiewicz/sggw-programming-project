@@ -63,6 +63,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene\Block.cs" />
     <Compile Include="Scene\BaseScene.cs" />
+    <Compile Include="Scene\Levels.cs" />
+    <Compile Include="Scene\Menu.cs" />
     <Compile Include="Scene\IBlock.cs" />
     <Compile Include="Scene\SceneLayer.cs" />
     <Compile Include="Scene\SceneList.cs" />
