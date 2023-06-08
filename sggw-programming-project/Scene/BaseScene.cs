@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace sggw_programming_project.Scene
 {
@@ -11,6 +12,8 @@ namespace sggw_programming_project.Scene
         //klasa dla pole (sceny) zawierająca bloki (drzewa / sciany / przeciwników)
         public int Id { get => _id; }
         private int _id { get; set; }
+
+        public bool isSceneRunning = true;
 
         private int _width;
         private int _height;
@@ -183,28 +186,28 @@ namespace sggw_programming_project.Scene
             Block block = (Block)sender;
             if (block.Id == "fruit")
             {
-                
-                    _score += block.Point;
-                    howFruitCandy--;
-                    _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
-                
+
+                _score += block.Point;
+                howFruitCandy--;
+                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+
             }
 
             if (block.Id == "candy")
             {
-                
-                    _score += block.Point;
-                    howFruitCandy--;
-                    _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+
+                _score += block.Point;
+                howFruitCandy--;
+                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
 
             }
 
-            if(block.Id == "enemy")
+            if (block.Id == "enemy")
             {
                 _player.Health -= 30;
             }
 
-            if(block.Id == "heart")
+            if (block.Id == "heart")
             {
                 _player.Health += 50;
                 _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
@@ -213,7 +216,7 @@ namespace sggw_programming_project.Scene
 
         }
 
-            public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
+        public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
             if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
             {
@@ -259,45 +262,45 @@ namespace sggw_programming_project.Scene
                     default:
                         break;
                 }
-                EnemyControls();
             } while (pressedKey.Key != ConsoleKey.Escape);
 
 
         }
 
-        public void EnemyControls()
+        public void AddEnemyControls()
         {   //Poruszanie się naszego wroga
             //Porusza się za kazdym razem gdy uzytkownik wciśnie klawisz, nie wiem jak to zrobić
             //aby poruszał się niezależnie :( help
-            Random random = new Random();
-            bool x = true;
             SceneLayer characterSceneLayer = _sceneLayers[1];
-            while (x)
+            for (; ; )
             {
+                Random random = new Random();
+
                 int number = random.Next(5);
                 switch (number)
                 {
                     case 0:
                         this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, -1, 0);
-                        x = false;
                         break;
                     case 1:
                         this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 1, 0);
-                        x = false;
+
                         break;
                     case 2:
                         this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, 1);
-                        x = false;
+
                         break;
                     case 3:
                         this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, -1);
-                        x = false;
+
                         break;
                     default:
                         break;
                 }
+                if (!isSceneRunning)
+                    break;
+                Thread.Sleep(500);
             }
-
         }
 
         public void isWin()
@@ -308,15 +311,17 @@ namespace sggw_programming_project.Scene
                 // przerenderownie
                 this.Render();
             }
-            else if(_player.Health <= 0)
+            else if (_player.Health <= 0)
             {
                 Console.Clear();
                 Console.WriteLine("Straciłeś życie! Przegrałeś!");
+                isSceneRunning = false;
             }
             else
             {
                 Console.Clear();
                 Console.WriteLine("Wygrałeś! Udało Ci się zdobyć {0} Punktów!", _score);
+                isSceneRunning = false;
             }
         }
 

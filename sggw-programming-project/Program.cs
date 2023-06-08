@@ -20,6 +20,7 @@ namespace sggw_programming_project
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             BaseScene scene1 = new BaseScene(1,16,16, 10, 3,10,15,10, 2, 1);
             scene1.Render();
+            Task.Run(() => scene1.AddEnemyControls());
             scene1.AddCharacterControls();
             Console.ReadKey();
         }
