@@ -67,7 +67,6 @@
     <Compile Include="Scene\Menu.cs" />
     <Compile Include="Scene\IBlock.cs" />
     <Compile Include="Scene\SceneLayer.cs" />
-    <Compile Include="Scene\SceneList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
