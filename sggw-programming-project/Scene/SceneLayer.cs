@@ -48,6 +48,9 @@ namespace sggw_programming_project.Scene
 
         public Block MoveBlockToCoords(int x, int y, int targetX, int targetY)
         {
+            if (Scene[x, y] == null)
+                return Scene[targetX, targetY];
+
             Scene[targetX, targetY] = Scene[x, y];
             Scene[targetX,targetY].SetCoords(targetX, targetY);
 

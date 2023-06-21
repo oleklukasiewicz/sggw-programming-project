@@ -344,7 +344,7 @@ namespace sggw_programming_project.Scene
         public void isWin()
         {
             //Metoda sprawdzająca czy użytkownik Wygrał czy Przegrał
-            if (howFruitCandy > 0 && _player.Health > 0)
+            if (howFruitCandy > 0 && _player.Health > 0 && _enemy.Health>0)
             {
                 // przerenderownie
                 this.Render();
@@ -365,7 +365,7 @@ namespace sggw_programming_project.Scene
 
         public void DeleteBlockInScene(Block block)
         {
-            _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+            _sceneLayers[0].Scene[block.X, block.Y] = _sceneLayers[0].DefaultBlock;
         }
 
         ///UWAGA: TESTOWE METODY I POLA
