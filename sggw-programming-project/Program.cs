@@ -25,11 +25,6 @@ namespace sggw_programming_project
             scene1.AddCharacterControls();
             Console.ReadKey();
         }
-        /* To DO:
-         * - sterowanie bloczkiem Enemy, aby sam podążał za graczem
-         * * b) zabijanie przeciwnika i eliminowanie go z planszy
-         * * d) bloczki-owoce co kilka sekund losowo zmieniają swoje położenie
-         * */
     }
 
 }

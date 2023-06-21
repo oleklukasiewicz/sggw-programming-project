@@ -30,6 +30,8 @@ namespace sggw_programming_project.Scene
         // for enetity tracking
         private List<Block> _entities = new List<Block>();
 
+        private bool HaveGun = false;
+
 
         public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone,
             int howTree, int howTrunk, int howCandy, int howHeart)
@@ -152,6 +154,15 @@ namespace sggw_programming_project.Scene
                 bl = IsRepeatDone(bl, list);
                 list.Add(bl);
             }
+
+            Block gun = new GunBlock();
+            gun = IsRepeatDone(gun, list);
+            list.Add(gun);
+
+            Block heart = new HeartBlock();
+            heart = IsRepeatDone(heart, list);
+            list.Add(heart);
+            
             return list;
         }
 
@@ -177,8 +188,11 @@ namespace sggw_programming_project.Scene
                     string icon = target.Icon;
                     Console.Write(icon);
                 }
+                string ekwipunek = "brak";
+                if (HaveGun == true)
+                { ekwipunek = "\ud83d\udd2a"; }
                 if (i == 0) Console.Write("         Score: " + _score);
-                if (i == 1) Console.Write("         Ilość do zdobycia: " + howFruitCandy);
+                if (i == 1) Console.Write("         Equipment: " + ekwipunek);
                 if (i == 2) Console.Write("         Player Health: " + _player.Health);
                 if (i == 3) Console.Write("         Enemy Health: " + _enemy.Health);
                 if (i == 4) Console.Write($"         Player X:{playerX}");
@@ -195,7 +209,7 @@ namespace sggw_programming_project.Scene
 
                 _score += block.Point;
                 howFruitCandy--;
-                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                DeleteBlockInScene(block);
 
             }
 
@@ -204,19 +218,39 @@ namespace sggw_programming_project.Scene
 
                 _score += block.Point;
                 howFruitCandy--;
-                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                DeleteBlockInScene(block);
 
             }
 
             if (block.Id == "enemy")
             {
-                _player.Health -= 30;
+                if (HaveGun == true)
+                {
+                    _enemy.Health -= 30;
+                    if (_enemy.Health < 0) _enemy.Health = 0;
+                    if (_enemy.Health == 0)
+                    {
+                        _sceneLayers[1].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                    }
+                }
+                else
+                {
+                    _player.Health -= 30;
+                }
+
             }
 
             if (block.Id == "heart")
             {
                 _player.Health += 50;
-                _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                DeleteBlockInScene(block);
+            }
+
+
+            if(block.Id == "gun")
+            {
+                HaveGun = true;
+                DeleteBlockInScene(block);
             }
 
 
@@ -274,9 +308,7 @@ namespace sggw_programming_project.Scene
         }
 
         public void AddEnemyControls()
-        {   //Poruszanie się naszego wroga
-            //Porusza się za kazdym razem gdy uzytkownik wciśnie klawisz, nie wiem jak to zrobić
-            //aby poruszał się niezależnie :( help
+        {
             SceneLayer characterSceneLayer = _sceneLayers[1];
             for (; ; )
             {
@@ -329,6 +361,11 @@ namespace sggw_programming_project.Scene
                 Console.WriteLine("Wygrałeś! Udało Ci się zdobyć {0} Punktów!", _score);
                 isSceneRunning = false;
             }
+        }
+
+        public void DeleteBlockInScene(Block block)
+        {
+            _sceneLayers[0].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
         }
 
         ///UWAGA: TESTOWE METODY I POLA

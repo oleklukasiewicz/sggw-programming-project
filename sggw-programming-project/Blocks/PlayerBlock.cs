@@ -15,4 +15,3 @@ internal class PlayerBlock : Block
     }
 
 }
-// kod na diamencik: \ud83d\udc8e

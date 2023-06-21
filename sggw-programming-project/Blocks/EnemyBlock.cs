@@ -11,6 +11,8 @@ namespace sggw_programming_project.Blocks
     {
         public override string Id { get; } = "enemy";
         public override string Icon { get; set; } = "\ud83d\ude21";
+
+        public override int Health { get; set; } = 100;
         public EnemyBlock()
         {
             this.SetRandomLocation();
