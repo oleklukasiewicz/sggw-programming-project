@@ -1,4 +1,5 @@
-﻿using sggw_programming_project.Scene;
+﻿using sggw_programming_project.Entity;
+using sggw_programming_project.Scene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace sggw_programming_project.Blocks
         public override string Id { get; } = "heart";
         public override string Icon { get; set; } = "\ud83d\udc96";
 
+        public override BaseEntity BlockEntity { get; } = new HealingEntity(10);
     }
 }

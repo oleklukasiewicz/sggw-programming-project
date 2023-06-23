@@ -10,22 +10,24 @@ namespace sggw_programming_project.EntityControllers
 {
     internal class BaseEntityController
     {
-        //klasa dla kontolera moba(entity) - klasa bedzie sterowała ruchem oraz zachowaniem
+        protected BaseScene _scene;
+        protected SceneLayer _sceneLayer;
+        protected Block _targetBlock;
+        protected bool isControlActive = true;
 
-        private IBaseEntity _targetEntity;
-        private IBlock _targetBlock;
-
-        private int _maxX;
-        private int _maxY;
-        public BaseEntityController(ref IBlock block, int maxX = 0, int maxY = 0)
+        public BaseEntityController(BaseScene scene, SceneLayer layer, Block block)
         {
+            _scene = scene;
+            _sceneLayer = layer;
             _targetBlock = block;
-            _targetEntity = block.BlockEntity;
         }
-        public IBlock MoveTo(int x, int y)
+        public virtual void ControlEntity()
         {
-            //
-            return _targetBlock;
+            Console.WriteLine("Control");
+        }
+        public virtual void CancelEntityControl()
+        {
+            isControlActive = false;
         }
     }
 }

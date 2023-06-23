@@ -4,174 +4,92 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using sggw_programming_project.Helpers;
+using sggw_programming_project.EntityControllers;
+using sggw_programming_project.Entity;
 
 namespace sggw_programming_project.Scene
 {
+
+    delegate void SceneStopHandler (object sender, EventArgs e);
     internal class BaseScene
     {
-        //klasa dla pole (sceny) zawierająca bloki (drzewa / sciany / przeciwników)
-        public int Id { get => _id; }
-        private int _id { get; set; }
+        private const int FPS = 30;
 
-        public bool isSceneRunning = true;
+        private const int frameTimer = 1000 / FPS;
+
+        private bool isSceneRunning = true;
 
         private int _width;
         private int _height;
 
-        private int _score = 0;
-        private int howFruitCandy = 0;
-        // domyślny blok do wypełnienia sceny
+        public event SceneStopHandler OnSceneStop;
 
-        private Block _player;
-        private Block _enemy;
+        public PlayerBlock Player;
+        public EnemyBlock Enemy;
 
-        private List<SceneLayer> _sceneLayers = new List<SceneLayer>();
+        public List<SceneLayer> SceneLayers = new List<SceneLayer>();
 
-        // for enetity tracking
-        private List<Block> _entities = new List<Block>();
-
-        private bool HaveGun = false;
-
-
-        public BaseScene(int id, int width, int height, int howGrass, int howFruit, int howStone,
-            int howTree, int howTrunk, int howCandy, int howHeart)
+        private Block _defaultBlock = new Block()
         {
+            Icon = "\ud83d\udfea",
+        };
 
-            _id = id;
+        private Random rand = new Random();
+        public BaseScene(int width, int height, Dictionary<string, int> config)
+        {
             _width = width;
             _height = height;
 
-            _player = new PlayerBlock();
-            _enemy = new EnemyBlock();
-            howFruitCandy = howCandy + howFruit;
-            _entities.Add(_player);
+            Player = new PlayerBlock();
+            Enemy = new EnemyBlock();
+
             do
             {
-                _enemy.SetRandomLocation();
-            } while (_player.X == _enemy.X && _player.Y == _enemy.Y);
-            _entities.Add(_enemy);
+                Enemy.SetCoords(rand.Next(_width),rand.Next(_height));
+            } while (Player.X == Enemy.X && Player.Y == Enemy.Y);          
 
-            _sceneLayers.Add(new SceneLayer(width, height, new Block("\ud83d\udfea")));
-            _sceneLayers[0].SetupScene(GenerateListBlock(howGrass, howFruit, howStone, howTree, howTrunk, howCandy, howHeart));
+            //block layer
+            SceneLayers.Add(new SceneLayer(width, height, (Block)_defaultBlock));
+            SceneLayers[0].SetupScene(SceneHelpers.GenerateListBlock(_width, _height, config));
 
-            _sceneLayers.Add(new SceneLayer(width, height));
-            _sceneLayers[1].SetupScene(new List<Block>() { _enemy });
+            //player layer
+            SceneLayers.Add(new SceneLayer(width, height));
+            SceneLayers[1].SetupScene(new List<Block>() { Enemy });
 
-            _sceneLayers.Add(new SceneLayer(_width, _height));
-            _sceneLayers[2].SetupScene(new List<Block>() { _player });
+            //enemy layer
+            SceneLayers.Add(new SceneLayer(_width, _height));
+            SceneLayers[2].SetupScene(new List<Block>() { Player });
 
-            _player.OnCoordsChange += UpdateTab;
+            SceneLayers[0].OnLayerUpdate += LayerUpdate;
+            SceneLayers[1].OnLayerUpdate += LayerUpdate;
+            SceneLayers[2].OnLayerUpdate += LayerUpdate;
+
+            this.Player.BlockEntity.OnDie += PlayerDied;
+            this.Enemy.BlockEntity.OnDie += EnemyDied;
+
+            Prepare();
         }
-
         private Block _GetTopLayerBlock(int x, int y)
         {
-            for (int l = _sceneLayers.Count - 1; l >= 0; l--)
+            for (int l = SceneLayers.Count - 1; l >= 0; l--)
             {
-                if (_sceneLayers[l].Scene[x, y] != null)
+                if (SceneLayers[l].Scene[x, y] != null)
                 {
-                    return _sceneLayers[l].Scene[x, y];
+                    return SceneLayers[l].Scene[x, y];
                 }
             }
             return null;
         }
-        private Block IsRepeatDone(Block block, List<Block> list)
-        {
-
-            bool isDone = false;
-            bool isRepeat = false;
-
-            while (!isDone)
-            {
-                block.SetRandomLocation();
-
-                foreach (var item in list)
-                {
-                    if (item.X == block.X && item.Y == block.Y)
-                    {
-                        isRepeat = true;
-                        break;
-                    }
-                    else
-                    {
-                        isRepeat = false;
-                    }
-                }
-
-                if (isRepeat == false) isDone = true;
-            }
-            return block;
-
-        }
-        //TODO: do przerobienia system losowego wsadzania bloków -> na jakiś bardziej optymalny
-        private List<Block> GenerateListBlock(int howGrass, int howFruit, int howStone,
-          int howTree, int howTrunk, int howCandy, int howHeart)
-        {
-            //tworzenie listy elementów które mają się pojawić na planszy z losowym rozmieszczeniem.
-            List<Block> list = new List<Block>();
-
-            for (int i = 0; i < howGrass; i++)
-            {
-                Block bl = new GrassBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-
-            }
-            for (int i = 0; i < howFruit; i++)
-            {
-                Block bl = new FruitBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-
-            }
-            for (int i = 0; i < howStone; i++)
-            {
-                Block bl = new StoneBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-            }
-            for (int i = 0; i < howTree; i++)
-            {
-                Block bl = new TreeBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-
-            }
-            for (int i = 0; i < howTrunk; i++)
-            {
-                Block bl = new TrunkBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-            }
-            for (int i = 0; i < howCandy; i++)
-            {
-                Block bl = new CandyBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-            }
-            for (int i = 0; i < howHeart; i++)
-            {
-                Block bl = new HeartBlock();
-                bl = IsRepeatDone(bl, list);
-                list.Add(bl);
-            }
-
-            Block gun = new GunBlock();
-            gun = IsRepeatDone(gun, list);
-            list.Add(gun);
-
-            Block heart = new HeartBlock();
-            heart = IsRepeatDone(heart, list);
-            list.Add(heart);
-            
-            return list;
-        }
-
-        //metoda do wyświetlania sceny
         public void MenuControl()
         {
-            Menu menu = new Menu(_player);
+            Menu menu = new Menu(Player);
             menu.ChooseAvatar();
             Console.Clear();
+        }
+        private void LayerUpdate(object sender,EventArgs e)
+        {
+           
         }
         public void Render()
         {
@@ -181,206 +99,127 @@ namespace sggw_programming_project.Scene
             {
                 for (int j = 0; j < _width; j++)
                 {
-                    Block target = new Block();
-
-                    target = _GetTopLayerBlock(i, j);
+                    Block target = _GetTopLayerBlock(i, j);
 
                     string icon = target.Icon;
                     Console.Write(icon);
                 }
                 string ekwipunek = "brak";
-                if (HaveGun == true)
+                if (Player.BlockEntity.DamageUpdated == true)
                 { ekwipunek = "\ud83d\udd2a"; }
-                if (i == 0) Console.Write("         Score: " + _score);
-                if (i == 1) Console.Write("         Equipment: " + ekwipunek);
-                if (i == 2) Console.Write("         Player Health: " + _player.Health);
-                if (i == 3) Console.Write("         Enemy Health: " + _enemy.Health);
-                if (i == 4) Console.Write($"         Player X:{playerX}");
-                if (i == 5) Console.Write($"         Player Y:{playerY}");
+
+                if (i == 0) Console.Write($"         FPS[{FPS}]");
+                if (i == 2) Console.Write("         Equipment: " + ekwipunek);
+                if (i == 3) Console.Write("         Player Health: " + Player.BlockEntity.Health);
+                if (i == 4) Console.Write("         Enemy Health: " + Enemy.BlockEntity.Health);
+                if (i == 5) Console.Write($"         Player X:{Player.X}");
+                if (i == 6) Console.Write($"         Player Y:{Player.Y}");
                 Console.WriteLine();
             }
         }
 
-        protected virtual void OnBlockStepIn(object sender)
+        private void OnBlockStepIn(object sender,StepInEventArgs args)
         {
-            Block block = (Block)sender;
-            if (block.Id == "fruit")
+           Block senderBlock = sender as Block;
+
+            if (senderBlock != null)
             {
-
-                _score += block.Point;
-                howFruitCandy--;
-                DeleteBlockInScene(block);
-
-            }
-
-            if (block.Id == "candy")
-            {
-
-                _score += block.Point;
-                howFruitCandy--;
-                DeleteBlockInScene(block);
-
-            }
-
-            if (block.Id == "enemy")
-            {
-                if (HaveGun == true)
+                if(senderBlock.BlockEntity != null)
                 {
-                    _enemy.Health -= 30;
-                    if (_enemy.Health < 0) _enemy.Health = 0;
-                    if (_enemy.Health == 0)
+                    BaseEntity blockEntity = senderBlock.BlockEntity;
+                    BaseEntity stepperEntity = args.stepper.BlockEntity;
+                    if (blockEntity != null)
                     {
-                        _sceneLayers[1].Scene[block.X, block.Y] = new Block(block.X, block.Y, "\ud83d\udfea");
+                        //uzdrawianie
+                        if(blockEntity.Healing!=0)
+                        {
+                            stepperEntity.Heal(blockEntity.Healing);
+                        }
+                        if(blockEntity.Damage!=0)
+                        {
+                            blockEntity.TakeDamage(stepperEntity.Damage);
+                        }
+                        if(blockEntity.UpdateDamage!=0)
+                        {
+                            stepperEntity.UpgradeDamage(blockEntity.UpdateDamage);
+                        }
                     }
                 }
-                else
-                {
-                    _player.Health -= 30;
-                }
-
             }
-
-            if (block.Id == "heart")
-            {
-                _player.Health += 50;
-                DeleteBlockInScene(block);
-            }
-
-
-            if(block.Id == "gun")
-            {
-                HaveGun = true;
-                DeleteBlockInScene(block);
-            }
-
 
         }
 
         public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
+            if (x == targetX && y == targetY)
+                return;
+
             if (targetX < _width && targetY < _height && targetX >= 0 && targetY >= 0)
             {
                 Block target = _GetTopLayerBlock(targetX, targetY);
                 Block source = _GetTopLayerBlock(x, y);
                 if (target.CanBeStepIn)
                 {
-                    OnBlockStepIn(target);
-                    source.StepOut();
-                    target.StepIn();
+                    source.StepOut(source);
+                    target.StepIn(source);
                     targetScene.MoveBlockToCoords(x, y, targetX, targetY);
                 }
             }
-            isWin();
         }
         public void MoveBlockBy(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
             MoveBlock(targetScene, x, y, x + targetX, y + targetY);
         }
-        public void AddCharacterControls()
+        private void Prepare()
         {
-            //na razie na sztywno ale póżniej to zmienie (prawda?)
-            SceneLayer characterSceneLayer = _sceneLayers[2];
+            for(int i = 0;i<SceneLayers.Count;i++) {
+                SceneLayer layer = SceneLayers[i];
+                if (layer != null)
+                {
+                    Block[,] scene = layer.Scene;
+                    if (scene != null)
+                    {
+                        for(int j=0;j<_width;j++)
+                        {
+                            for(int k = 0; k < _height;k++)
+                            {
+                                if(scene[j,k] != null )
+                                scene[j, k].OnStepIn += OnBlockStepIn;
+                            }
+                        }
+                    }
+                }
+            
+            }
+        }
+        private void StopScene()
+        {
+            isSceneRunning = false;
+            OnSceneStop?.Invoke(this,new EventArgs());
+        }
 
-            ConsoleKeyInfo pressedKey;
+        public void PlayerDied(object sender, EventArgs e)
+        {
+            StopScene();
+            Console.Clear();
+            Console.WriteLine("Straciłeś życie! Przegrałeś!");
+        }
+
+        public void EnemyDied(object sender, EventArgs e)
+        {
+            StopScene();
+            Console.Clear();
+            Console.WriteLine("Wygrałeś! Udało Ci się!");
+        }
+
+        public void StartEngine()
+        {
             do
             {
-                pressedKey = Console.ReadKey();
-                switch (pressedKey.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, -1, 0);
-                        break;
-                    case ConsoleKey.DownArrow:
-                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 1, 0);
-                        break;
-                    case ConsoleKey.RightArrow:
-                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 0, 1);
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        this.MoveBlockBy(characterSceneLayer, _player.X, _player.Y, 0, -1);
-                        break;
-                    default:
-                        break;
-                }
-            } while (pressedKey.Key != ConsoleKey.Escape);
-
-
-        }
-
-        public void AddEnemyControls()
-        {
-            SceneLayer characterSceneLayer = _sceneLayers[1];
-            for (; ; )
-            {
-                Random random = new Random();
-
-                int number = random.Next(5);
-                switch (number)
-                {
-                    case 0:
-                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, -1, 0);
-                        break;
-                    case 1:
-                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 1, 0);
-
-                        break;
-                    case 2:
-                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, 1);
-
-                        break;
-                    case 3:
-                        this.MoveBlockBy(characterSceneLayer, _enemy.X, _enemy.Y, 0, -1);
-
-                        break;
-                    default:
-                        break;
-                }
-                if (!isSceneRunning)
-                    break;
-                Thread.Sleep(500);
-            }
-        }
-
-        public void isWin()
-        {
-            //Metoda sprawdzająca czy użytkownik Wygrał czy Przegrał
-            if (howFruitCandy > 0 && _player.Health > 0 && _enemy.Health>0)
-            {
-                // przerenderownie
-                this.Render();
-            }
-            else if (_player.Health <= 0)
-            {
-                Console.Clear();
-                Console.WriteLine("Straciłeś życie! Przegrałeś!");
-                isSceneRunning = false;
-            }
-            else
-            {
-                Console.Clear();
-                Console.WriteLine("Wygrałeś! Udało Ci się zdobyć {0} Punktów!", _score);
-                isSceneRunning = false;
-            }
-        }
-
-        public void DeleteBlockInScene(Block block)
-        {
-            _sceneLayers[0].Scene[block.X, block.Y] = _sceneLayers[0].DefaultBlock;
-        }
-
-        ///UWAGA: TESTOWE METODY I POLA
-        ///
-        int playerX = 0;
-        int playerY = 0;
-        int playerHealth = 100;
-        private void UpdateTab(object sender, CoordsChangeEventArgs e)
-        {
-            playerX = e.X;
-            playerY = e.Y;
-        }
-        private void UpdatePlayerHealth()
-        {
-
+                if (isSceneRunning)
+                    this.Render();
+                Thread.Sleep(frameTimer);
+            } while (isSceneRunning);
         }
     }
 }
