@@ -14,21 +14,16 @@ namespace sggw_programming_project.Scene
     delegate void SceneStopHandler (object sender, EventArgs e);
     internal class BaseScene
     {
+        //events
+        public event SceneStopHandler OnSceneStop;
+        
+        //private fields
         private const int FPS = 30;
-
         private const int frameTimer = 1000 / FPS;
-
         private bool isSceneRunning = true;
 
         private int _width;
         private int _height;
-
-        public event SceneStopHandler OnSceneStop;
-
-        public PlayerBlock Player;
-        public EnemyBlock Enemy;
-
-        public List<SceneLayer> SceneLayers = new List<SceneLayer>();
 
         private Block _defaultBlock = new Block()
         {
@@ -36,6 +31,12 @@ namespace sggw_programming_project.Scene
         };
 
         private Random rand = new Random();
+
+        //public fields
+        public PlayerBlock Player;
+        public EnemyBlock Enemy;
+
+        public List<SceneLayer> SceneLayers = new List<SceneLayer>();
         public BaseScene(int width, int height, Dictionary<string, int> config)
         {
             _width = width;
@@ -81,43 +82,10 @@ namespace sggw_programming_project.Scene
             }
             return null;
         }
-        public void MenuControl()
-        {
-            Menu menu = new Menu(Player);
-            menu.ChooseAvatar();
-            Console.Clear();
-        }
         private void LayerUpdate(object sender,EventArgs e)
         {
            
         }
-        public void Render()
-        {
-            Console.Clear();
-            //Wydrukowanie sceny na ekranie
-            for (int i = 0; i < _height; i++)
-            {
-                for (int j = 0; j < _width; j++)
-                {
-                    Block target = _GetTopLayerBlock(i, j);
-
-                    string icon = target.Icon;
-                    Console.Write(icon);
-                }
-                string ekwipunek = "brak";
-                if (Player.BlockEntity.DamageUpdated == true)
-                { ekwipunek = "\ud83d\udd2a"; }
-
-                if (i == 0) Console.Write($"         FPS[{FPS}]");
-                if (i == 2) Console.Write("         Equipment: " + ekwipunek);
-                if (i == 3) Console.Write("         Player Health: " + Player.BlockEntity.Health);
-                if (i == 4) Console.Write("         Enemy Health: " + Enemy.BlockEntity.Health);
-                if (i == 5) Console.Write($"         Player X:{Player.X}");
-                if (i == 6) Console.Write($"         Player Y:{Player.Y}");
-                Console.WriteLine();
-            }
-        }
-
         private void OnBlockStepIn(object sender,StepInEventArgs args)
         {
            Block senderBlock = sender as Block;
@@ -148,7 +116,34 @@ namespace sggw_programming_project.Scene
             }
 
         }
+        private void StopScene()
+        {
+            isSceneRunning = false;
+            OnSceneStop?.Invoke(this, new EventArgs());
+        }
+        private void Prepare()
+        {
+            for (int i = 0; i < SceneLayers.Count; i++)
+            {
+                SceneLayer layer = SceneLayers[i];
+                if (layer != null)
+                {
+                    Block[,] scene = layer.Scene;
+                    if (scene != null)
+                    {
+                        for (int j = 0; j < _width; j++)
+                        {
+                            for (int k = 0; k < _height; k++)
+                            {
+                                if (scene[j, k] != null)
+                                    scene[j, k].OnStepIn += OnBlockStepIn;
+                            }
+                        }
+                    }
+                }
 
+            }
+        }
         public void MoveBlock(SceneLayer targetScene, int x, int y, int targetX, int targetY)
         {
             if (x == targetX && y == targetY)
@@ -170,33 +165,6 @@ namespace sggw_programming_project.Scene
         {
             MoveBlock(targetScene, x, y, x + targetX, y + targetY);
         }
-        private void Prepare()
-        {
-            for(int i = 0;i<SceneLayers.Count;i++) {
-                SceneLayer layer = SceneLayers[i];
-                if (layer != null)
-                {
-                    Block[,] scene = layer.Scene;
-                    if (scene != null)
-                    {
-                        for(int j=0;j<_width;j++)
-                        {
-                            for(int k = 0; k < _height;k++)
-                            {
-                                if(scene[j,k] != null )
-                                scene[j, k].OnStepIn += OnBlockStepIn;
-                            }
-                        }
-                    }
-                }
-            
-            }
-        }
-        private void StopScene()
-        {
-            isSceneRunning = false;
-            OnSceneStop?.Invoke(this,new EventArgs());
-        }
 
         public void PlayerDied(object sender, EventArgs e)
         {
@@ -204,14 +172,13 @@ namespace sggw_programming_project.Scene
             Console.Clear();
             Console.WriteLine("Straciłeś życie! Przegrałeś!");
         }
-
         public void EnemyDied(object sender, EventArgs e)
         {
             StopScene();
             Console.Clear();
             Console.WriteLine("Wygrałeś! Udało Ci się!");
         }
-
+       
         public void StartEngine()
         {
             do
@@ -220,6 +187,32 @@ namespace sggw_programming_project.Scene
                     this.Render();
                 Thread.Sleep(frameTimer);
             } while (isSceneRunning);
+        }
+        public void Render()
+        {
+            Console.Clear();
+            //Wydrukowanie sceny na ekranie
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    Block target = _GetTopLayerBlock(i, j);
+
+                    string icon = target.Icon;
+                    Console.Write(icon);
+                }
+                string ekwipunek = "";
+                if (Player.BlockEntity.DamageUpdated == true)
+                { ekwipunek = "\ud83d\udd2a"; }
+
+                if (i == 0) Console.Write($"         FPS[{FPS}]");
+                if (i == 2) Console.Write("         Damage: " + ekwipunek+$" [{Player.BlockEntity.Damage}]");
+                if (i == 3) Console.Write("         Player Health: " + Player.BlockEntity.Health);
+                if (i == 4) Console.Write("         Enemy Health: " + Enemy.BlockEntity.Health);
+                if (i == 5) Console.Write($"         Player X:{Player.X}");
+                if (i == 6) Console.Write($"         Player Y:{Player.Y}");
+                Console.WriteLine();
+            }
         }
     }
 }

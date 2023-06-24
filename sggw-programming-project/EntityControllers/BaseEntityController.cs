@@ -14,7 +14,6 @@ namespace sggw_programming_project.EntityControllers
         protected SceneLayer _sceneLayer;
         protected Block _targetBlock;
         protected bool isControlActive = true;
-
         public BaseEntityController(BaseScene scene, SceneLayer layer, Block block)
         {
             _scene = scene;

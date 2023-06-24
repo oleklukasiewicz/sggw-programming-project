@@ -14,10 +14,8 @@ namespace sggw_programming_project.Helpers
         {
             foreach (var b in blocks)
             {
-                if (b.X == x && b.Y == y)
-                {               
+                if (b.X == x && b.Y == y)              
                         return true;
-                }
             }
             return false;
         }

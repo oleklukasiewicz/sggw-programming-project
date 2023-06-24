@@ -12,6 +12,6 @@ namespace sggw_programming_project.Blocks
     {
         public override string Id { get; } = "gun";
         public override string Icon { get; set; } = "\ud83d\udd2a";
-        public override BaseEntity BlockEntity => new UpdateDamageEntity(7);
+        public override BaseEntity BlockEntity => new UpdateDamageEntity(3);
     }
 }

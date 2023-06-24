@@ -22,19 +22,21 @@ namespace sggw_programming_project
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             BaseScene scene1 = new BaseScene(10, 10, new Dictionary<string, int>()
             {
-                {"grass",8 },
+                {"grass",15 },
                 {"fruit",3 },
                 {"stone",8 },
                 {"tree",7 },
-                {"trunk",4 },
+                {"trunk",7 },
                 {"candy",2 },
                 {"heart",1 },
-                {"gun",5 }
+                {"gun",2 }
             });
-            scene1.OnSceneStop += StopController;
+            scene1.OnSceneStop += StopControllers;
 
-            scene1.MenuControl();
-           
+            Menu menu = new Menu(scene1.Player);
+            menu.ChooseAvatar();
+            Console.Clear();
+
             enemyController = new EnemyController(scene1, scene1.SceneLayers[1], scene1.Enemy);
             playerController = new PlayerController(scene1, scene1.SceneLayers[2], scene1.Player);
 
@@ -46,7 +48,7 @@ namespace sggw_programming_project
             Console.ReadKey();
         }
 
-        static void StopController(object sender, EventArgs e)
+        static void StopControllers(object sender, EventArgs e)
         {
             enemyController.CancelEntityControl();
             playerController.CancelEntityControl();

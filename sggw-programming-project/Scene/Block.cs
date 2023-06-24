@@ -9,7 +9,14 @@ namespace sggw_programming_project.Scene
     delegate void EntityRemoveHandler(object sender, EventArgs e);
     internal class Block
     {
-        
+        public event StepInHandler OnStepIn;
+        public event StepOutHandler OnStepOut;
+        public event CoordsChangeHandler OnCoordsChange;
+        public event EntityRemoveHandler OnEntityRemove;
+        public virtual string Id { get; } = "block";
+        public virtual string Icon { get; set; }
+        public virtual bool CanBeStepIn { get; set; } = true;
+
         protected int _x;
         public int X
         {
@@ -31,26 +38,6 @@ namespace sggw_programming_project.Scene
         public virtual BaseEntity BlockEntity { get => _entity; }
         private BaseEntity _entity { get; set; }
 
-        public event StepInHandler OnStepIn;
-        public event StepOutHandler OnStepOut;
-        public event CoordsChangeHandler OnCoordsChange;
-        public event EntityRemoveHandler OnEntityRemove;
-        public virtual string Id { get; } = "block";
-        public virtual string Icon { get; set; }
-        public virtual bool CanBeStepIn { get; set; } = true;
-
-        public Block(int x, int y, BaseEntity entity)
-        {
-            _x = x;
-            _y = y;
-            _entity = entity;
-        }
-        public Block(int x, int y)
-        {
-            _x = x;
-            _y = y;
-            _entity = new BaseEntity();
-        }
         public Block(string icon)
         {
             Icon = icon;
